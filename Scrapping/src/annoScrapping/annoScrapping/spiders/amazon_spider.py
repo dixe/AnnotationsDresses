@@ -8,6 +8,19 @@ class AmazoneSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        filename = "Response.html"
-        with open(filename, 'wb') as f:
-            f.write(response.body)
+        followLinks = []
+
+        sel = response.xpath("//div[contains(@id,'resultsCol')]")
+        reses = sel.xpath(".//ul/li")
+        i = 0
+        for res in reses:
+            indexes = len(res.xpath("./div/div/div/a/@href").extract())
+            for j in range(indexes):
+                link = res.xpath("./div/div/div/a/@href").extract()[j]
+                if link.startswith("http"):
+                    followLinks.append(link)
+                    break
+
+        # debuggin code kinda useful
+        # with open("test.txt",'w') as f:
+        #     f.write("\n".join(followLinks))
